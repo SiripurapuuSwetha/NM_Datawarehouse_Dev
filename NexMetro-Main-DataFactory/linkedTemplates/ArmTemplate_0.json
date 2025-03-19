@@ -1,0 +1,375 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "NexMetro-Main-DataFactory"
+		},
+		"AzureDataLakeStorage1_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage1'"
+		},
+		"ConnectToSql_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'ConnectToSql'"
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://nmstorageaccount1.dfs.core.windows.net/"
+		},
+		"ConnectToSql_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "NM0147\\MSSQLSERVER01"
+		},
+		"ConnectToSql_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "3_12_2025"
+		},
+		"ConnectToSql_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "AzureAD\\swethasiripurapu"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorage1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('AzureDataLakeStorage1_accountKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SelfHostedIntegrationRuntime')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Sqlserversink')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "dev-sql"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ConnectToSql')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"server": "[parameters('ConnectToSql_properties_typeProperties_server')]",
+					"database": "[parameters('ConnectToSql_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": true,
+					"authenticationType": "Windows",
+					"userName": "[parameters('ConnectToSql_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('ConnectToSql_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "SelfHostedIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/SelfHostedIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SqlServerTable1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ConnectToSql",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "HMY",
+						"type": "decimal",
+						"precision": 18,
+						"scale": 0
+					},
+					{
+						"name": "SABSORB",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DBUDGET",
+						"type": "decimal",
+						"precision": 21,
+						"scale": 6
+					},
+					{
+						"name": "DTOTSQFT",
+						"type": "decimal",
+						"precision": 21,
+						"scale": 6
+					},
+					{
+						"name": "DOCCSQFT",
+						"type": "decimal",
+						"precision": 21,
+						"scale": 6
+					},
+					{
+						"name": "DLEASEDSQFT",
+						"type": "decimal",
+						"precision": 21,
+						"scale": 6
+					},
+					{
+						"name": "DEXPIRESQFT",
+						"type": "decimal",
+						"precision": 21,
+						"scale": 6
+					},
+					{
+						"name": "ILEASES",
+						"type": "decimal",
+						"precision": 18,
+						"scale": 0
+					},
+					{
+						"name": "IEXPIRES",
+						"type": "decimal",
+						"precision": 18,
+						"scale": 0
+					},
+					{
+						"name": "DRENT",
+						"type": "decimal",
+						"precision": 21,
+						"scale": 6
+					},
+					{
+						"name": "HPROP",
+						"type": "decimal",
+						"precision": 18,
+						"scale": 0
+					},
+					{
+						"name": "SREMARKS",
+						"type": "varchar"
+					},
+					{
+						"name": "dLeasedSqftMonth",
+						"type": "decimal",
+						"precision": 21,
+						"scale": 6
+					},
+					{
+						"name": "dRenewalSqft",
+						"type": "decimal",
+						"precision": 21,
+						"scale": 6
+					},
+					{
+						"name": "dHoldoverSqft",
+						"type": "decimal",
+						"precision": 21,
+						"scale": 6
+					},
+					{
+						"name": "dExpireSqftMonth1",
+						"type": "decimal",
+						"precision": 21,
+						"scale": 6
+					},
+					{
+						"name": "dExpireSqftMonth2",
+						"type": "decimal",
+						"precision": 21,
+						"scale": 6
+					},
+					{
+						"name": "dExpireSqftMonth3",
+						"type": "decimal",
+						"precision": 21,
+						"scale": 6
+					},
+					{
+						"name": "dExpireSqftMonth4_12",
+						"type": "decimal",
+						"precision": 21,
+						"scale": 6
+					},
+					{
+						"name": "dExpireSqftQtr1",
+						"type": "decimal",
+						"precision": 21,
+						"scale": 6
+					},
+					{
+						"name": "dExpireSqftQtr2",
+						"type": "decimal",
+						"precision": 21,
+						"scale": 6
+					},
+					{
+						"name": "dExpireSqftQtr3",
+						"type": "decimal",
+						"precision": 21,
+						"scale": 6
+					},
+					{
+						"name": "dExpireSqftQtr4",
+						"type": "decimal",
+						"precision": 21,
+						"scale": 6
+					},
+					{
+						"name": "iNewDeal",
+						"type": "decimal",
+						"precision": 18,
+						"scale": 0
+					},
+					{
+						"name": "iRenewDeal",
+						"type": "decimal",
+						"precision": 18,
+						"scale": 0
+					},
+					{
+						"name": "dNewDealSqft",
+						"type": "decimal",
+						"precision": 18,
+						"scale": 6
+					},
+					{
+						"name": "dRenewDealSqft",
+						"type": "decimal",
+						"precision": 18,
+						"scale": 6
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "ABSORB"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ConnectToSql')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy sql data",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SqlServerTable1",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Sqlserversink",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SqlServerTable1')]",
+				"[concat(variables('factoryId'), '/datasets/Sqlserversink')]"
+			]
+		}
+	]
+}
