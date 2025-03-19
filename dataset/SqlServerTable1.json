@@ -1,0 +1,177 @@
+{
+	"name": "SqlServerTable1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ConnectToSql",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "HMY",
+				"type": "decimal",
+				"precision": 18,
+				"scale": 0
+			},
+			{
+				"name": "SABSORB",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "DBUDGET",
+				"type": "decimal",
+				"precision": 21,
+				"scale": 6
+			},
+			{
+				"name": "DTOTSQFT",
+				"type": "decimal",
+				"precision": 21,
+				"scale": 6
+			},
+			{
+				"name": "DOCCSQFT",
+				"type": "decimal",
+				"precision": 21,
+				"scale": 6
+			},
+			{
+				"name": "DLEASEDSQFT",
+				"type": "decimal",
+				"precision": 21,
+				"scale": 6
+			},
+			{
+				"name": "DEXPIRESQFT",
+				"type": "decimal",
+				"precision": 21,
+				"scale": 6
+			},
+			{
+				"name": "ILEASES",
+				"type": "decimal",
+				"precision": 18,
+				"scale": 0
+			},
+			{
+				"name": "IEXPIRES",
+				"type": "decimal",
+				"precision": 18,
+				"scale": 0
+			},
+			{
+				"name": "DRENT",
+				"type": "decimal",
+				"precision": 21,
+				"scale": 6
+			},
+			{
+				"name": "HPROP",
+				"type": "decimal",
+				"precision": 18,
+				"scale": 0
+			},
+			{
+				"name": "SREMARKS",
+				"type": "varchar"
+			},
+			{
+				"name": "dLeasedSqftMonth",
+				"type": "decimal",
+				"precision": 21,
+				"scale": 6
+			},
+			{
+				"name": "dRenewalSqft",
+				"type": "decimal",
+				"precision": 21,
+				"scale": 6
+			},
+			{
+				"name": "dHoldoverSqft",
+				"type": "decimal",
+				"precision": 21,
+				"scale": 6
+			},
+			{
+				"name": "dExpireSqftMonth1",
+				"type": "decimal",
+				"precision": 21,
+				"scale": 6
+			},
+			{
+				"name": "dExpireSqftMonth2",
+				"type": "decimal",
+				"precision": 21,
+				"scale": 6
+			},
+			{
+				"name": "dExpireSqftMonth3",
+				"type": "decimal",
+				"precision": 21,
+				"scale": 6
+			},
+			{
+				"name": "dExpireSqftMonth4_12",
+				"type": "decimal",
+				"precision": 21,
+				"scale": 6
+			},
+			{
+				"name": "dExpireSqftQtr1",
+				"type": "decimal",
+				"precision": 21,
+				"scale": 6
+			},
+			{
+				"name": "dExpireSqftQtr2",
+				"type": "decimal",
+				"precision": 21,
+				"scale": 6
+			},
+			{
+				"name": "dExpireSqftQtr3",
+				"type": "decimal",
+				"precision": 21,
+				"scale": 6
+			},
+			{
+				"name": "dExpireSqftQtr4",
+				"type": "decimal",
+				"precision": 21,
+				"scale": 6
+			},
+			{
+				"name": "iNewDeal",
+				"type": "decimal",
+				"precision": 18,
+				"scale": 0
+			},
+			{
+				"name": "iRenewDeal",
+				"type": "decimal",
+				"precision": 18,
+				"scale": 0
+			},
+			{
+				"name": "dNewDealSqft",
+				"type": "decimal",
+				"precision": 18,
+				"scale": 6
+			},
+			{
+				"name": "dRenewDealSqft",
+				"type": "decimal",
+				"precision": 18,
+				"scale": 6
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "ABSORB"
+		}
+	}
+}
