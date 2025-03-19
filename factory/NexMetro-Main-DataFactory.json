@@ -1,0 +1,9 @@
+{
+	"name": "NexMetro-Main-DataFactory",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "178f64cd-f891-4d81-9456-d9e49d0df0c3",
+		"tenantId": "3e1ece3d-cc77-4330-b4f3-5beaa581bf22"
+	}
+}
