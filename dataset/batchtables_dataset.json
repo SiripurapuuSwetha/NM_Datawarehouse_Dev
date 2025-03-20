@@ -1,0 +1,12 @@
+{
+	"name": "batchtables_dataset",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ConnectToSql",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": []
+	}
+}
