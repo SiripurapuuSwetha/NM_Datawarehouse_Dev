@@ -18,7 +18,7 @@
 					"source": {
 						"type": "SqlServerSource",
 						"sqlReaderQuery": "SELECT\ns.name as SchemaName,\nt.name as TableName\nfrom sys.tables t\nINNER JOIN sys.schemas s\non t.schema_id = s.schema_id\nwhere s.name = 'dbo'",
-						"queryTimeout": "02:00:00",
+						"queryTimeout": "00:10:00",
 						"partitionOption": "None"
 					},
 					"dataset": {
