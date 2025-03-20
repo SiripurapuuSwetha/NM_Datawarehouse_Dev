@@ -6,7 +6,7 @@
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"SchemaNmae": {
+			"SchemaName": {
 				"type": "string"
 			},
 			"TableName": {
@@ -19,11 +19,11 @@
 			"location": {
 				"type": "AzureBlobFSLocation",
 				"fileName": {
-					"value": "@{concat(dataset().TableName, 'csv')}",
+					"value": "@{concat(dataset().TableName, '.csv')}",
 					"type": "Expression"
 				},
 				"folderPath": {
-					"value": "@{concat(dataset().SchemaNmae, '/', dataset().TableName)}",
+					"value": "@{concat(dataset().SchemaName, '/', dataset().TableName)}",
 					"type": "Expression"
 				},
 				"fileSystem": "dev-sql"
