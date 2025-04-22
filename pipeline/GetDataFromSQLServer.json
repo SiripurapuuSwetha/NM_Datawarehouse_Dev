@@ -45,6 +45,7 @@
 						"value": "@activity('Lookup1').output.value",
 						"type": "Expression"
 					},
+					"batchCount": 1,
 					"activities": [
 						{
 							"name": "copy tables in batch",
