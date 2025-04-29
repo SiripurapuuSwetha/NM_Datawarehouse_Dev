@@ -65,7 +65,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@range(1, variables('totalPages') + 1)",
+						"value": "@range(1, add(variables('totalPages'), 1))\n",
 						"type": "Expression"
 					},
 					"activities": [
@@ -125,7 +125,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"items": {
-									"value": "@activity('Lookup1').output.value",
+									"value": "@activity('LookupTables').output.value\n",
 									"type": "Expression"
 								},
 								"isSequential": false,
