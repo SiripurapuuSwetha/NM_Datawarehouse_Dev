@@ -3,7 +3,31 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Lookup1",
+				"name": "SettotalPages",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetTotalTableCount",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "TotalPages",
+					"value": {
+						"value": "@div(add(int(activity('GetTotalTableCount').output.firstRow.TotalTables), sub(pipeline().parameters.PageSize, 1)), pipeline().parameters.PageSize)\n",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "GetTotalTableCount",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -17,23 +41,22 @@
 				"typeProperties": {
 					"source": {
 						"type": "SqlServerSource",
-						"sqlReaderQuery": "SELECT\ns.name as SchemaName,\nt.name as TableName\nfrom sys.tables t\nINNER JOIN sys.schemas s\non t.schema_id = s.schema_id\nwhere s.name = 'dbo'",
-						"queryTimeout": "00:10:00",
+						"sqlReaderQuery": "SELECT COUNT(*) AS TotalTables\nFROM sys.tables t\nJOIN sys.schemas s ON t.schema_id = s.schema_id\nWHERE s.name = 'dbo'",
+						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
 					"dataset": {
 						"referenceName": "batchmigrationToSQL",
 						"type": "DatasetReference"
-					},
-					"firstRowOnly": false
+					}
 				}
 			},
 			{
-				"name": "ForEachteable",
+				"name": "ForEachPage",
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Lookup1",
+						"activity": "SettotalPages",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -42,14 +65,13 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Lookup1').output.value",
+						"value": "@range(1, variables('totalPages') + 1)",
 						"type": "Expression"
 					},
-					"isSequential": false,
 					"activities": [
 						{
-							"name": "copy tables in batch",
-							"type": "Copy",
+							"name": "LookupTables",
+							"type": "Lookup",
 							"dependsOn": [],
 							"policy": {
 								"timeout": "0.12:00:00",
@@ -62,61 +84,138 @@
 							"typeProperties": {
 								"source": {
 									"type": "SqlServerSource",
-									"sqlReaderQuery": {
-										"value": "@{concat('SELECT * FROM [', item().SchemaName, '].[', item().TableName, ']')}",
-										"type": "Expression"
+									"sqlReaderStoredProcedureName": "[dbo].[GetPagedTables]",
+									"storedProcedureParameters": {
+										"PageNumber": {
+											"type": "Int32",
+											"value": {
+												"value": "@item()\n",
+												"type": "Expression"
+											}
+										},
+										"PageSize": {
+											"type": "Int32",
+											"value": {
+												"value": "@pipeline().parameters.PageSize",
+												"type": "Expression"
+											}
+										}
 									},
-									"queryTimeout": "00:20:00",
+									"queryTimeout": "00:10:00",
 									"partitionOption": "None"
 								},
-								"sink": {
-									"type": "DelimitedTextSink",
-									"storeSettings": {
-										"type": "AzureBlobFSWriteSettings"
-									},
-									"formatSettings": {
-										"type": "DelimitedTextWriteSettings",
-										"quoteAllText": true,
-										"fileExtension": ".txt"
-									}
-								},
-								"enableStaging": false,
-								"translator": {
-									"type": "TabularTranslator",
-									"typeConversion": true,
-									"typeConversionSettings": {
-										"allowDataTruncation": true,
-										"treatBooleanAsNumber": false
-									}
-								}
-							},
-							"inputs": [
-								{
-									"referenceName": "batchtables_dataset",
+								"dataset": {
+									"referenceName": "batchmigrationToSQL",
 									"type": "DatasetReference"
+								},
+								"firstRowOnly": false
+							}
+						},
+						{
+							"name": "ForEachteable",
+							"type": "ForEach",
+							"dependsOn": [
+								{
+									"activity": "LookupTables",
+									"dependencyConditions": [
+										"Succeeded"
+									]
 								}
 							],
-							"outputs": [
-								{
-									"referenceName": "DelimitedText1",
-									"type": "DatasetReference",
-									"parameters": {
-										"SchemaName": {
-											"value": "@item().SchemaName",
-											"type": "Expression"
+							"userProperties": [],
+							"typeProperties": {
+								"items": {
+									"value": "@activity('Lookup1').output.value",
+									"type": "Expression"
+								},
+								"isSequential": false,
+								"activities": [
+									{
+										"name": "copy tables in batch",
+										"type": "Copy",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
 										},
-										"TableName": {
-											"value": "@item().TableName",
-											"type": "Expression"
-										}
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "SqlServerSource",
+												"sqlReaderQuery": {
+													"value": "@{concat('SELECT * FROM [', item().SchemaName, '].[', item().TableName, ']')}",
+													"type": "Expression"
+												},
+												"queryTimeout": "02:00:00",
+												"partitionOption": "None"
+											},
+											"sink": {
+												"type": "DelimitedTextSink",
+												"storeSettings": {
+													"type": "AzureBlobFSWriteSettings"
+												},
+												"formatSettings": {
+													"type": "DelimitedTextWriteSettings",
+													"quoteAllText": true,
+													"fileExtension": ".txt"
+												}
+											},
+											"enableStaging": false,
+											"parallelCopies": 4,
+											"dataIntegrationUnits": 8,
+											"translator": {
+												"type": "TabularTranslator",
+												"typeConversion": true,
+												"typeConversionSettings": {
+													"allowDataTruncation": true,
+													"treatBooleanAsNumber": false
+												}
+											}
+										},
+										"inputs": [
+											{
+												"referenceName": "batchtables_dataset",
+												"type": "DatasetReference"
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "DelimitedText1",
+												"type": "DatasetReference",
+												"parameters": {
+													"SchemaName": {
+														"value": "@item().SchemaName",
+														"type": "Expression"
+													},
+													"TableName": {
+														"value": "@item().TableName",
+														"type": "Expression"
+													}
+												}
+											}
+										]
 									}
-								}
-							]
+								]
+							}
 						}
 					]
 				}
 			}
 		],
+		"parameters": {
+			"PageSize": {
+				"type": "int",
+				"defaultValue": 5000
+			}
+		},
+		"variables": {
+			"TotalPages": {
+				"type": "Integer"
+			}
+		},
 		"annotations": []
 	}
 }
