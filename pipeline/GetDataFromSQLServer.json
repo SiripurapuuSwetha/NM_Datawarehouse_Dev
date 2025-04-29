@@ -101,6 +101,9 @@
 		"variables": {
 			"TotalPages": {
 				"type": "Integer"
+			},
+			"PageNumber": {
+				"type": "Integer"
 			}
 		},
 		"annotations": []
