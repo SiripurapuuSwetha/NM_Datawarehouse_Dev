@@ -22,7 +22,7 @@
 							"PageNumber": {
 								"type": "Int32",
 								"value": {
-									"value": "@item()\n",
+									"value": "@pipeline().parameters.PageNumber",
 									"type": "Expression"
 								}
 							},
@@ -136,6 +136,9 @@
 			"PageSize": {
 				"type": "int",
 				"defaultValue": 5000
+			},
+			"PageNumber": {
+				"type": "int"
 			}
 		},
 		"variables": {
