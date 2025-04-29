@@ -65,7 +65,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@range(1, add(variables('totalPages'), 1))\n",
+						"value": "@range(1, add(variables('totalPages'), 1))",
 						"type": "Expression"
 					},
 					"activities": [
@@ -125,7 +125,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"items": {
-									"value": "@activity('LookupTables').output.value\n",
+									"value": "@activity('LookupTables').output.value",
 									"type": "Expression"
 								},
 								"isSequential": false,
@@ -209,6 +209,11 @@
 			"PageSize": {
 				"type": "int",
 				"defaultValue": 5000
+			}
+		},
+		"variables": {
+			"TotalPages": {
+				"type": "Integer"
 			}
 		},
 		"annotations": []
