@@ -70,135 +70,22 @@
 					},
 					"activities": [
 						{
-							"name": "LookupTables",
-							"type": "Lookup",
+							"name": "ExecuteProcessPagePipeline",
+							"type": "ExecutePipeline",
 							"dependsOn": [],
 							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
 								"secureInput": false
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"source": {
-									"type": "SqlServerSource",
-									"sqlReaderStoredProcedureName": "[dbo].[GetPagedTables]",
-									"storedProcedureParameters": {
-										"PageNumber": {
-											"type": "Int32",
-											"value": {
-												"value": "@item()\n",
-												"type": "Expression"
-											}
-										},
-										"PageSize": {
-											"type": "Int32",
-											"value": {
-												"value": "@pipeline().parameters.PageSize",
-												"type": "Expression"
-											}
-										}
-									},
-									"queryTimeout": "00:10:00",
-									"partitionOption": "None"
+								"pipeline": {
+									"referenceName": "ProcessPagePipeline",
+									"type": "PipelineReference"
 								},
-								"dataset": {
-									"referenceName": "batchmigrationToSQL",
-									"type": "DatasetReference"
-								},
-								"firstRowOnly": false
-							}
-						},
-						{
-							"name": "ForEachteable",
-							"type": "ForEach",
-							"dependsOn": [
-								{
-									"activity": "LookupTables",
-									"dependencyConditions": [
-										"Succeeded"
-									]
+								"waitOnCompletion": true,
+								"parameters": {
+									"PageSize": 5000
 								}
-							],
-							"userProperties": [],
-							"typeProperties": {
-								"items": {
-									"value": "@activity('LookupTables').output.value\n",
-									"type": "Expression"
-								},
-								"isSequential": false,
-								"activities": [
-									{
-										"name": "copy tables in batch",
-										"type": "Copy",
-										"dependsOn": [],
-										"policy": {
-											"timeout": "0.12:00:00",
-											"retry": 0,
-											"retryIntervalInSeconds": 30,
-											"secureOutput": false,
-											"secureInput": false
-										},
-										"userProperties": [],
-										"typeProperties": {
-											"source": {
-												"type": "SqlServerSource",
-												"sqlReaderQuery": {
-													"value": "@{concat('SELECT * FROM [', item().SchemaName, '].[', item().TableName, ']')}",
-													"type": "Expression"
-												},
-												"queryTimeout": "02:00:00",
-												"partitionOption": "None"
-											},
-											"sink": {
-												"type": "DelimitedTextSink",
-												"storeSettings": {
-													"type": "AzureBlobFSWriteSettings"
-												},
-												"formatSettings": {
-													"type": "DelimitedTextWriteSettings",
-													"quoteAllText": true,
-													"fileExtension": ".txt"
-												}
-											},
-											"enableStaging": false,
-											"parallelCopies": 4,
-											"dataIntegrationUnits": 8,
-											"translator": {
-												"type": "TabularTranslator",
-												"typeConversion": true,
-												"typeConversionSettings": {
-													"allowDataTruncation": true,
-													"treatBooleanAsNumber": false
-												}
-											}
-										},
-										"inputs": [
-											{
-												"referenceName": "batchtables_dataset",
-												"type": "DatasetReference"
-											}
-										],
-										"outputs": [
-											{
-												"referenceName": "DelimitedText1",
-												"type": "DatasetReference",
-												"parameters": {
-													"SchemaName": {
-														"value": "@item().SchemaName",
-														"type": "Expression"
-													},
-													"TableName": {
-														"value": "@item().TableName",
-														"type": "Expression"
-													}
-												}
-											}
-										]
-									}
-								]
 							}
 						}
 					]
