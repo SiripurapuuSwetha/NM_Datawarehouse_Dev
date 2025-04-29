@@ -22,7 +22,8 @@
 					"value": "@{concat(dataset().TableName,'.csv')}",
 					"type": "Expression"
 				},
-				"fileSystem": "dev-sql"
+				"folderPath": "Yardi_SQLserver",
+				"fileSystem": "dev-bronze"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
