@@ -95,10 +95,7 @@
 										},
 										"PageSize": {
 											"type": "Int32",
-											"value": {
-												"value": "@pipeline().parameters.PageSize",
-												"type": "Expression"
-											}
+											"value": "5000"
 										}
 									},
 									"queryTimeout": "00:10:00",
