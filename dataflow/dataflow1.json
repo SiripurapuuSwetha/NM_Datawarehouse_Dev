@@ -1,0 +1,62 @@
+{
+	"name": "dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "YieldStar_OfferedRentHistory",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "derivedColumn1",
+					"description": "adding a new column"
+				},
+				{
+					"name": "FillPropertyName"
+				},
+				{
+					"name": "rowindex",
+					"description": "create row index"
+				},
+				{
+					"name": "setrowindex"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          {_col0_} as string,",
+				"          {_col1_} as string,",
+				"          {_col2_} as string,",
+				"          {_col3_} as string,",
+				"          {_col4_} as string,",
+				"          {_col5_} as string,",
+				"          {_col6_} as string,",
+				"          {_col7_} as string,",
+				"          {_col8_} as string,",
+				"          {_col9_} as string,",
+				"          {_col10_} as string,",
+				"          {_col11_} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 derive({property flag} = iif(startsWith(lower(trim({_col0_})), 'avilla'), toString({_col0_}), toString(null()))\r",
+				"\r",
+				"\r",
+				") ~> derivedColumn1",
+				"setrowindex window(over({property flag}),",
+				"     column1 = ERROR_FUNCTION('')) ~> FillPropertyName",
+				"derivedColumn1 derive({Row Index} = random(1000)) ~> rowindex",
+				"rowindex rank(asc({Row Index}, true),",
+				"     output({Row Index} as long)) ~> setrowindex"
+			]
+		}
+	}
+}

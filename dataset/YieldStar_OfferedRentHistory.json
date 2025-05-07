@@ -1,0 +1,21 @@
+{
+	"name": "YieldStar_OfferedRentHistory",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"sheetName": "Offered Rent History Report",
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "PO_Offered Rent History Report_202504140557_13674443-en-us.xlsx",
+				"folderPath": "YieldStar_PA",
+				"fileSystem": "dev-bronze"
+			}
+		},
+		"schema": []
+	}
+}
